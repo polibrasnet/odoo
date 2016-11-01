@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import division, print_function, unicode_literals
+
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
@@ -523,7 +526,7 @@ class BaseModel(object):
             ModelClass._build_model_check_base(cls)
             check_parent = ModelClass._build_model_check_parent
         else:
-            ModelClass = type(name, (BaseModel,), {
+            ModelClass = type(str(name), (BaseModel,), {
                 '_name': name,
                 '_register': False,
                 '_original_module': cls._module,
@@ -2476,6 +2479,7 @@ class BaseModel(object):
                             if not res2 and field.index:
                                 cr.execute('CREATE INDEX "%s_%s_index" ON "%s" ("%s")' % (self._table, name, self._table, name))
                                 cr.commit()
+
                                 if field.type == 'text':
                                     # FIXME: for fields.text columns we should try creating GIN indexes instead (seems most suitable for an ERP context)
                                     msg = "Table '%s': Adding (b-tree) index for %s column '%s'."\
@@ -3535,6 +3539,10 @@ class BaseModel(object):
         old_vals, new_vals, unknown = {}, {}, []
         for key, val in vals.iteritems():
             field = self._fields.get(key)
+
+            if field.type in ('char', 'text'):
+                val = field.convert_to_write(val, False)
+
             if field:
                 if field.store or field.inherited:
                     old_vals[key] = val
@@ -3799,6 +3807,10 @@ class BaseModel(object):
         old_vals, new_vals, unknown = {}, {}, []
         for key, val in vals.iteritems():
             field = self._fields.get(key)
+
+            if field.type in ('char', 'text'):
+                val = field.convert_to_write(val, False)
+
             if field:
                 if field.store or field.inherited:
                     old_vals[key] = val

@@ -3,6 +3,9 @@
 
 """ High-level objects for fields. """
 
+from pybrasil.valor.decimal import Decimal
+from pybrasil.base import primeira_maiuscula
+
 from collections import OrderedDict, defaultdict
 from datetime import date, datetime
 from functools import partial
@@ -21,9 +24,6 @@ from odoo.tools import float_precision, float_repr, float_round, frozendict, \
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 from odoo.tools.translate import html_translate, _
-
-from pybrasil.valor.decimal import Decimal
-
 
 DATE_LENGTH = len(date.today().strftime(DATE_FORMAT))
 DATETIME_LENGTH = len(datetime.now().strftime(DATETIME_FORMAT))
@@ -1199,6 +1199,7 @@ class Float(Field):
         #return float_round(value, precision_digits=digits[1]) if digits else value
         if digits:
             value = value.quantize(Decimal(10) ** Decimal(digits[1] * -1))
+
         return value
 
     def convert_to_export(self, value, record):
@@ -1265,6 +1266,8 @@ class _String(Field):
     """ Abstract class for string fields. """
     _slots = {
         'translate': False,             # whether the field is translated
+        'case': None,
+        'strip': None,
     }
 
     def __init__(self, string=Default, **kwargs):
@@ -1315,6 +1318,93 @@ class _String(Field):
             return self.translate(callback, value)
         else:
             return value
+
+    def convert_to_read(self, value, record, use_name_get=True):
+        if ((self.case is None) and (self.strip is None)) or (not value):
+            return super(_String, self).convert_to_read(value, record, use_name_get=use_name_get)
+
+        if self.case == 'upper':
+            value = value.upper()
+        elif self.case == 'lower':
+            value = value.lower()
+        elif self.case is not None and (value == value.upper() or value == value.lower()):
+            value = primeira_maiuscula(value, acrescenta_ponto=True)
+
+        if self.strip is not None:
+            value = value.strip().replace(u' ', u' ')
+
+            if "'" in value:
+                aspas = value.split("'")
+                caracter = u'’'
+                value = u''
+                for texto in aspas[:0:-1]:
+                    value = caracter + texto + value
+                    if caracter == u'’':
+                        caracter = u'‘'
+                    else:
+                        caracter = u'’'
+
+                value = aspas[0] + value
+
+            if '"' in value:
+                aspas = value.split('"')
+                caracter = u'”'
+                value = u''
+                for texto in aspas[:0:-1]:
+                    value = caracter + texto + value
+                    if caracter == u'”':
+                        caracter = u'“'
+                    else:
+                        caracter = u'”'
+
+                value = aspas[0] + value
+
+        return super(_String, self).convert_to_read(value, record, use_name_get=use_name_get)
+
+    def convert_to_cache(self, value, record, validate=True):
+        if ((self.case is None) and (self.strip is None)) or (not value):
+            return super(_String, self).convert_to_cache(value, record, validate=validate)
+
+        if self.case == 'upper':
+            value = value.upper()
+        elif self.case == 'lower':
+            value = value.lower()
+        elif self.case is not None and (value == value.upper() or value == value.lower()):
+            value = primeira_maiuscula(value)
+
+        if self.strip is not None:
+            value = value.strip().replace(u' ', u' ')
+
+            if "'" in value:
+                aspas = value.split("'")
+                caracter = u'’'
+                value = u''
+                for texto in aspas[:0:-1]:
+                    value = caracter + texto + value
+                    if caracter == u'’':
+                        caracter = u'‘'
+                    else:
+                        caracter = u'’'
+
+                value = aspas[0] + value
+
+            if '"' in value:
+                aspas = value.split('"')
+                caracter = u'”'
+                value = u''
+                for texto in aspas[:0:-1]:
+                    value = caracter + texto + value
+                    if caracter == u'”':
+                        caracter = u'“'
+                    else:
+                        caracter = u'”'
+
+                value = aspas[0] + value
+
+        return super(_String, self).convert_to_cache(value, record, validate=validate)
+
+    def convert_to_write(self, value, record):
+        return self.convert_to_read(value, record)
 
 
 class Char(_String):
@@ -1875,6 +1965,7 @@ class Many2one(_Relational):
         'ondelete': 'set null',         # what to do when value is deleted
         'auto_join': False,             # whether joins are generated upon search
         'delegate': False,              # whether self implements delegation
+        'index': True,
     }
 
     def __init__(self, comodel_name=Default, string=Default, **kwargs):
@@ -2253,6 +2344,7 @@ class Many2many(_RelationalMulti):
         'column2': None,                # column of table referring to comodel
         'auto_join': False,             # whether joins are generated upon search
         'limit': None,                  # optional limit to use upon read
+        'index': True,
     }
 
     def __init__(self, comodel_name=Default, relation=Default, column1=Default,
@@ -2434,6 +2526,7 @@ class Id(Field):
         'string': 'ID',
         'store': True,
         'readonly': True,
+        'index': True,
     }
 
     def __get__(self, record, owner):
@@ -2450,3 +2543,103 @@ class Id(Field):
 from odoo import SUPERUSER_ID
 from .exceptions import AccessError, MissingError, UserError
 from .models import check_pg_name, BaseModel, IdType
+
+
+#
+# Campos Taŭga
+#
+class UpperChar(Char):
+    _slots = {
+        'strip': True,
+        'case': 'upper',
+    }
+
+
+class LowerChar(Char):
+    _slots = {
+        'strip': True,
+        'case': 'lower',
+    }
+
+
+class NameChar(Char):
+    _slots = {
+        'strip': True,
+        'case': 'name',
+    }
+
+class UpperText(Text):
+    _slots = {
+        'strip': True,
+        'case': 'upper',
+    }
+
+
+class LowerText(Text):
+    _slots = {
+        'strip': True,
+        'case': 'lower',
+    }
+
+
+class NameText(Text):
+    _slots = {
+        'strip': True,
+        'case': 'name',
+    }
+
+
+class Email(LowerChar):
+    pass
+
+
+class Site(LowerChar):
+    pass
+
+
+class Dinheiro(Float):
+    _slots = {
+        '_digits': (18, 2),
+        'group_operator': 'sum',
+        'default': 0,
+    }
+
+
+class Peso(Float):
+    _slots = {
+        '_digits': (18, 6),
+        'group_operator': 'sum',
+        'default': 0,
+    }
+
+
+class Porcentagem(Float):
+    _slots = {
+        '_digits': (5, 2),
+        'group_operator': 'avg',
+        'default': 0,
+    }
+
+
+class Quantidade(Float):
+    _slots = {
+        '_digits': (5, 4),
+        'group_operator': 'avg',
+        'default': 0,
+    }
+
+
+class Unitario(Float):
+    _slots = {
+        '_digits': (18, 4),
+        'group_operator': 'avg',
+        'default': 0,
+    }
+
+
+class Numero(Float):
+    _slots = {
+        '_digits': (18, 0),
+        'group_operator': 'sum',
+        'default': 0,
+    }
