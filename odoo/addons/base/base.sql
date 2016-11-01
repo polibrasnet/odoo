@@ -166,7 +166,7 @@ CREATE TABLE ir_model_relation (
     model integer NOT NULL references ir_model on delete restrict,
     name varchar NOT NULL,
     primary key(id)
-);  
+);
 
 CREATE TABLE res_currency (
     id serial,
@@ -209,3 +209,6 @@ select setval('res_partner_id_seq', 2);
 insert into res_users (id, login, password, active, partner_id, company_id) VALUES (1, 'admin', 'admin', true, 1, 1);
 insert into ir_model_data (name, module, model, noupdate, res_id) VALUES ('user_root', 'base', 'res.users', true, 1);
 select setval('res_users_id_seq', 2);
+
+CREATE EXTENSION IF NOT EXISTS unaccent;
+ALTER FUNCTION unaccent(text) IMMUTABLE;
