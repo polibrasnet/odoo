@@ -1167,7 +1167,7 @@ class Float(Field):
         # FLOAT8 type is still the default when there is no precision because it
         # is faster for most operations (sums, etc.)
         return ('numeric', 'numeric') if self.digits is not None else \
-               ('float8', 'double precision')
+               ('numeric', 'numeric')
 
     @property
     def digits(self):
@@ -2631,7 +2631,7 @@ class Quantidade(Float):
 
 class Unitario(Float):
     _slots = {
-        '_digits': (18, 4),
+        '_digits': (18, 10),
         'group_operator': 'avg',
         'default': 0,
     }
