@@ -1552,6 +1552,13 @@
             <field name="currency_id" ref="NZD" />
             <field eval="690" name="phone_code" />
         </record>
+        <record id="tl" model="res.country">
+            <field name="name">East Timor</field>
+            <field name="code">tl</field>
+            <field file="base/static/img/country_flags/tl.png" name="image" type="base64" />
+            <field name="currency_id" ref="USD" />
+            <field eval="670" name="phone_code" />
+        </record>
         <record id="tm" model="res.country">
             <field name="name">Turkmenistan</field>
             <field name="code">tm</field>
@@ -1574,7 +1581,7 @@
             <field eval="676" name="phone_code" />
         </record>
         <record id="tp" model="res.country">
-            <field name="name">East Timor</field>
+            <field name="name">East Timor (use TL instead)</field>
             <field name="code">tp</field>
             <field file="base/static/img/country_flags/tp.png" name="image" type="base64" />
             <field name="currency_id" ref="USD" />
