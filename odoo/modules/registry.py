@@ -116,7 +116,7 @@ class Registry(Mapping):
         # special cursor for test mode; None means "normal" mode
         self.test_cr = None
 
-        # Indicates that the registry is 
+        # Indicates that the registry is
         self.ready = False
 
         # Inter-process signaling (used only when odoo.multi_process is True):
@@ -167,14 +167,20 @@ class Registry(Mapping):
 
     def __getitem__(self, model_name):
         """ Return the model with the given name or raise KeyError if it doesn't exist."""
+        if isinstance(model_name, unicode):
+            model_name = model_name.encode('utf-8')
         return self.models[model_name]
 
     def __call__(self, model_name):
         """ Same as ``self[model_name]``. """
+        if isinstance(model_name, unicode):
+            model_name = model_name.encode('utf-8')
         return self.models[model_name]
 
     def __setitem__(self, model_name, model):
         """ Add or replace a model in the registry."""
+        if isinstance(model_name, unicode):
+            model_name = model_name.encode('utf-8')
         self.models[model_name] = model
 
     @lazy_classproperty
