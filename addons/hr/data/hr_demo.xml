@@ -5,7 +5,7 @@
     <!--Department-->
 
       <record id="dep_management" model="hr.department">
-          <field name="name">Management</field>
+          <field name="name">Accountant</field>
       </record>
 
       <record id="dep_rd" model="hr.department">
