@@ -5,7 +5,7 @@
     <!--Department-->
 
       <record id="dep_management" model="hr.department">
-          <field name="name">Accountant</field>
+          <field name="name">Management</field>
       </record>
 
       <record id="dep_rd" model="hr.department">
@@ -136,11 +136,11 @@ If you have development competencies, we can propose you specific traineeships</
     <!--Employees-->
 
       <record id="employee_root" model="hr.employee">
-          <field name="name">Pieter Parker</field>
+          <field name="name">Matheus Tanaquesr</field>
           <field name="calendar_id" ref="resource.timesheet_group1"/>
           <field name="work_location">Building 1, Second Floor</field>
           <field name="work_phone">+3281813700</field>
-          <field name="work_email">pieter@openerp.com</field>
+          <field name="work_email">matheustanaques@polibrasnet.com.br</field>
           <field name="category_ids" eval="[(6, 0, [ref('employee_category_4'), ref('employee_category_3')])]"/>
           <field name="job_id" ref="hr.job_ceo"/>
           <field name="department_id" ref="dep_management"/>
