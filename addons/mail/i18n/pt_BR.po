@@ -931,7 +931,7 @@ msgstr "Modo de composição"
 #: code:addons/mail/static/src/xml/thread.xml:24
 #, python-format
 msgid "Congratulations, your inbox is empty"
-msgstr "Parabéns, sua caixa de entrada está vazia"
+msgstr "Parabéns, sua caixa de entrada está vazia !!!!"
 
 #. module: mail
 #: model:ir.ui.view,arch_db:mail.email_template_form
