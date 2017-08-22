@@ -1,0 +1,64 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* my-module
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-08-22 15:12+0000\n"
+"PO-Revision-Date: 2017-08-22 15:12+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: my-module
+#: model:ir.ui.view,arch_db:my-module.course_form_view
+msgid "About"
+msgstr "Sobre"
+
+#. module: my-module
+#: model:ir.ui.view,arch_db:my-module.course_form_view
+msgid "Course Form"
+msgstr ""
+
+#. module: my-module
+#: model:ir.actions.act_window,name:my-module.course_list_action
+#: model:ir.ui.menu,name:my-module.courses_menu
+msgid "Courses"
+msgstr "Cursos"
+
+#. module: my-module
+#: model:ir.actions.act_window,help:my-module.course_list_action
+msgid "Create the first course"
+msgstr "Crie o primeiro curso"
+
+#. module: my-module
+#: model:ir.ui.view,arch_db:my-module.course_form_view
+msgid "Description"
+msgstr "Descrição"
+
+#. module: my-module
+#: model:ir.ui.menu,name:my-module.main_openacademy_menu
+#: model:ir.ui.menu,name:my-module.openacademy_menu
+msgid "Open Academy"
+msgstr "Academia aberta"
+
+#. module: my-module
+#: model:ir.ui.view,arch_db:my-module.course_form_view
+msgid "This is an example of notebooks"
+msgstr "Isto é um exemplo de notebooks"
+
+#. module: my-module
+#: model:ir.model,name:my-module.model_openacademy_course
+msgid "openacademy.course"
+msgstr ""
+
+#. module: my-module
+#: model:ir.model,name:my-module.model_openacademy_session
+msgid "openacademy.session"
+msgstr ""
+
