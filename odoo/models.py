@@ -18,7 +18,6 @@
           - classical (varchar, integer, boolean, ...)
           - relational (one2many, many2one, many2many)
           - functional
-
 """
 
 import datetime
@@ -66,21 +65,16 @@ AUTOINIT_RECALCULATE_STORED_FIELDS = 1000
 
 def check_object_name(name):
     """ Check if the given name is a valid model name.
-
         The _name attribute in osv and osv_memory object is subject to
         some restrictions. This function returns True or False whether
         the given name is allowed or not.
-
         TODO: this is an approximation. The goal in this approximation
         is to disallow uppercase characters (in some places, we quote
         table/column names and in other not, which leads to this kind
         of errors:
-
             psycopg2.ProgrammingError: relation "xxx" does not exist).
-
         The same restriction should apply to both osv and osv_memory
         objects for consistency.
-
     """
     if regex_object_name.match(name) is None:
         return False
@@ -125,7 +119,6 @@ def fix_import_export_id_paths(fieldname):
     """
     Fixes the id fields in import and exports, and splits field paths
     on '/'.
-
     :param str fieldname: name of the field to import/export
     :return: split field name
     :rtype: list of str
@@ -193,29 +186,22 @@ MAGIC_COLUMNS = ['id'] + LOG_ACCESS_COLUMNS
 
 class BaseModel(object):
     """ Base class for Odoo models.
-
     Odoo models are created by inheriting:
-
     *   :class:`Model` for regular database-persisted models
-
     *   :class:`TransientModel` for temporary data, stored in the database but
         automatically vacuumed every so often
-
     *   :class:`AbstractModel` for abstract super classes meant to be shared by
         multiple inheriting models
-
     The system automatically instantiates every model once per database. Those
     instances represent the available models on each database, and depend on
     which modules are installed on that database. The actual class of each
     instance is built from the Python classes that create and inherit from the
     corresponding model.
-
     Every model instance is a "recordset", i.e., an ordered collection of
     records of the model. Recordsets are returned by methods like
     :meth:`~.browse`, :meth:`~.search`, or field accesses. Records have no
     explicit representation: a record is represented as a recordset of one
     record.
-
     To create a class that should not be instantiated, the _register class
     attribute may be set to False.
     """
@@ -406,7 +392,6 @@ class BaseModel(object):
     @api.model
     def _add_magic_fields(self):
         """ Introduce magic fields on the current class
-
         * id is a "normal" field (with a specific getter)
         * create_uid, create_date, write_uid and write_date have become
           "normal" fields
@@ -414,12 +399,10 @@ class BaseModel(object):
           method defined dynamically. Uses ``str(datetime.datetime.utcnow())``
           to get the same structure as the previous
           ``(now() at time zone 'UTC')::timestamp``::
-
               # select (now() at time zone 'UTC')::timestamp;
                         timezone
               ----------------------------
                2013-06-18 08:30:37.292809
-
               >>> str(datetime.datetime.utcnow())
               '2013-06-18 08:31:32.821177'
         """
@@ -467,12 +450,10 @@ class BaseModel(object):
     @classmethod
     def _build_model(cls, pool, cr):
         """ Instantiate a given model in the registry.
-
         This method creates or extends a "registry" class for the given model.
         This "registry" class carries inferred model metadata, and inherits (in
         the Python sense) from all classes that define the model, and possibly
         other registry classes.
-
         """
 
         # In the simplest case, the model's registry class inherits from cls and
@@ -754,7 +735,6 @@ class BaseModel(object):
     @api.multi
     def _export_rows(self, fields):
         """ Export fields of the records in ``self``.
-
             :param fields: list of lists of fields to traverse
             :return: list of lists of corresponding values
         """
@@ -824,11 +804,9 @@ class BaseModel(object):
     @api.multi
     def export_data(self, fields_to_export, raw_data=False):
         """ Export fields for selected objects
-
             :param fields_to_export: list of fields
             :param raw_data: True to return value in native Python type
             :rtype: dictionary with a *datas* matrix
-
             This method is used when exporting data via client menu
         """
         fields_to_export = map(fix_import_export_id_paths, fields_to_export)
@@ -842,11 +820,9 @@ class BaseModel(object):
         Attempts to load the data matrix, and returns a list of ids (or
         ``False`` if there was an error and no id could be generated) and a
         list of messages.
-
         The ids are those of the records created and saved (in database), in
         the same order they were extracted from the file. They can be passed
         directly to :meth:`~read`
-
         :param fields: list of fields to import, at the same index as the corresponding data
         :type fields: list(str)
         :param data: row-major matrix of data to import
@@ -920,13 +896,10 @@ class BaseModel(object):
     @api.model
     def _extract_records(self, fields_, data, log=lambda a: None):
         """ Generates record dicts from the data sequence.
-
         The result is a generator of dicts mapping field names to raw
         (unconverted, unvalidated) values.
-
         For relational fields, if sub-fields were provided the value will be
         a list of sub-records
-
         The following sub-fields may be set on the record (by key):
         * None is the name_get for the record (to use with name_create/name_search)
         * "id" is the External ID for the record
@@ -996,7 +969,6 @@ class BaseModel(object):
         """ Converts records from the source iterable (recursive dicts of
         strings) into forms which can be written to the database (via
         self.create or (ir.model.data)._update)
-
         :returns: a list of triplets of (id, xid, record)
         :rtype: list((int|None, str|None, dict))
         """
@@ -1085,15 +1057,12 @@ class BaseModel(object):
     @api.model
     def default_get(self, fields_list):
         """ default_get(fields) -> default_values
-
         Return default values for the fields in ``fields_list``. Default
         values are determined by the context, user defaults, and the model
         itself.
-
         :param fields_list: a list of field names
         :return: a dictionary mapping each field name to its corresponding
             default value, if it has one.
-
         """
         # trigger view init hook
         self.view_init(fields_list)
@@ -1158,7 +1127,6 @@ class BaseModel(object):
         ``groups``, and is not a member of any of the groups in ``groups``
         preceded by ``!``. Typically used to resolve ``groups`` attribute in
         view and model definitions.
-
         :param str groups: comma-separated list of fully-qualified group
             external IDs, e.g., ``base.group_user,base.group_system``,
             optionally preceded by ``!``
@@ -1202,7 +1170,6 @@ class BaseModel(object):
     def _get_default_form_view(self):
         """ Generates a default single-line form view using all fields
         of the current model.
-
         :returns: a form view as an lxml document
         :rtype: etree._Element
         """
@@ -1222,7 +1189,6 @@ class BaseModel(object):
     @api.model
     def _get_default_search_view(self):
         """ Generates a single-field search view, based on _rec_name.
-
         :returns: a tree view as an lxml document
         :rtype: etree._Element
         """
@@ -1232,7 +1198,6 @@ class BaseModel(object):
     @api.model
     def _get_default_tree_view(self):
         """ Generates a single-field tree view, based on _rec_name.
-
         :returns: a tree view as an lxml document
         :rtype: etree._Element
         """
@@ -1242,7 +1207,6 @@ class BaseModel(object):
     @api.model
     def _get_default_pivot_view(self):
         """ Generates an empty pivot view.
-
         :returns: a pivot view as an lxml document
         :rtype: etree._Element
         """
@@ -1251,7 +1215,6 @@ class BaseModel(object):
     @api.model
     def _get_default_kanban_view(self):
         """ Generates a single-field kanban view, based on _rec_name.
-
         :returns: a kanban view as an lxml document
         :rtype: etree._Element
         """
@@ -1265,7 +1228,6 @@ class BaseModel(object):
     @api.model
     def _get_default_graph_view(self):
         """ Generates a single-field graph view, based on _rec_name.
-
         :returns: a graph view as an lxml document
         :rtype: etree._Element
         """
@@ -1276,14 +1238,12 @@ class BaseModel(object):
     def _get_default_calendar_view(self):
         """ Generates a default calendar view by trying to infer
         calendar fields from a number of pre-set attribute names
-
         :returns: a calendar view
         :rtype: etree._Element
         """
         def set_first_of(seq, in_, to):
             """Sets the first value of ``seq`` also found in ``in_`` to
             the ``to`` attribute of the ``view`` being closed over.
-
             Returns whether it's found a suitable value (and set it on
             the attribute) or not
             """
@@ -1320,7 +1280,6 @@ class BaseModel(object):
     @api.model
     def load_views(self, views, options=None):
         """ Returns the fields_views of given views, and optionally filters and fields.
-
         :param views: list of [view_id, view_type]
         :param options['toolbar']: True to include contextual actions when loading fields_views
         :param options['load_filters']: True to return the model's filters
@@ -1349,9 +1308,7 @@ class BaseModel(object):
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         """ fields_view_get([view_id | view_type='form'])
-
         Get the detailed composition of the requested view like fields, model, view architecture
-
         :param view_id: id of the view or None
         :param view_type: type of the view to return if view_id is None ('form', 'tree', ...)
         :param toolbar: true to include contextual actions
@@ -1488,7 +1445,6 @@ class BaseModel(object):
     @api.model
     def search_count(self, args):
         """ search_count(args) -> int
-
         Returns the number of records in the current model matching :ref:`the
         provided domain <reference/orm/domains>`.
         """
@@ -1501,10 +1457,8 @@ class BaseModel(object):
         downgrade=lambda self, value, args, offset=0, limit=None, order=None, count=False: value if count else value.ids)
     def search(self, args, offset=0, limit=None, order=None, count=False):
         """ search(args[, offset=0][, limit=None][, order=None][, count=False])
-
         Searches for records based on the ``args``
         :ref:`search domain <reference/orm/domains>`.
-
         :param args: :ref:`A search domain <reference/orm/domains>`. Use an empty
                      list to match all records.
         :param int offset: number of results to ignore (default: none)
@@ -1512,7 +1466,6 @@ class BaseModel(object):
         :param str order: sort string
         :param bool count: if True, only counts and returns the number of matching records (default: False)
         :returns: at most ``limit`` records matching the search criteria
-
         :raise AccessError: * if user tries to bypass access rules for read on the requested object.
         """
         res = self._search(args, offset=offset, limit=limit, order=order, count=count)
@@ -1531,10 +1484,8 @@ class BaseModel(object):
     @api.multi
     def name_get(self):
         """ name_get() -> [(id, name), ...]
-
         Returns a textual representation for the records in ``self``.
         By default this is the value of the ``display_name`` field.
-
         :return: list of pairs ``(id, text_repr)`` for each records
         :rtype: list(tuple)
         """
@@ -1553,14 +1504,11 @@ class BaseModel(object):
     @api.model
     def name_create(self, name):
         """ name_create(name) -> record
-
         Create a new record by calling :meth:`~.create` with only one value
         provided: the display name of the new record.
-
         The new record will be initialized with any default values
         applicable to this model, or provided through the context. The usual
         behavior of :meth:`~.create` applies.
-
         :param name: display name of the record to create
         :rtype: tuple
         :return: the :meth:`~.name_get` pair value of the created record
@@ -1575,19 +1523,15 @@ class BaseModel(object):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         """ name_search(name='', args=None, operator='ilike', limit=100) -> records
-
         Search for records that have a display name matching the given
         ``name`` pattern when compared with the given ``operator``, while also
         matching the optional search domain (``args``).
-
         This is used for example to provide suggestions based on a partial
         value for a relational field. Sometimes be seen as the inverse
         function of :meth:`~.name_get`, but it is not guaranteed to be.
-
         This method is equivalent to calling :meth:`~.search` with a search
         domain based on ``display_name`` and then :meth:`~.name_get` on the
         result of the search.
-
         :param str name: the name pattern to match
         :param list args: optional search domain (see :meth:`~.search` for
                           syntax), specifying further restrictions
@@ -1650,7 +1594,6 @@ class BaseModel(object):
     @classmethod
     def clear_caches(cls):
         """ Clear the caches
-
         This clears the caches associated to methods decorated with
         ``tools.ormcache`` or ``tools.ormcache_multi``.
         """
@@ -1837,7 +1780,6 @@ class BaseModel(object):
             Helper method to format the data contained in the dictionary data by 
             adding the domain corresponding to its values, the groupbys in the 
             context and by properly formatting the date/datetime values.
-
         :param data: a single group
         :param annotated_groupbys: expanded grouping metainformation
         :param groupby: original grouping metainformation
@@ -1903,7 +1845,6 @@ class BaseModel(object):
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         """
         Get the list of records in list view grouped by the given ``groupby`` fields
-
         :param domain: list specifying search criteria [['field_name', 'operator', 'value'], ...]
         :param list fields: list of fields present in the list view specified on the object
         :param list groupby: list of groupby descriptions by which the records will be grouped.  
@@ -1921,7 +1862,6 @@ class BaseModel(object):
                 remaining groupbys are put in the __context key.  If false, all the groupbys are
                 done in one call.
         :return: list of dictionaries(one dictionary for each record) containing:
-
                     * the values of fields grouped by the fields in ``groupby`` argument
                     * __domain: list of tuples specifying the search criteria
                     * __context: dictionary with argument like ``groupby``
@@ -2063,7 +2003,6 @@ class BaseModel(object):
         """
         Adds missing table select and join clause(s) to ``query`` for reaching
         the field coming from an '_inherits' parent table (no duplicates).
-
         :param alias: name of the initial SQL alias
         :param fname: name of inherited field to reach
         :param query: query object on which the JOIN should be added
@@ -2311,7 +2250,6 @@ class BaseModel(object):
         - add database indices to match ``self._fields``,
         - save in self._foreign_keys a list a foreign keys to create (see
           _auto_end).
-
         Note: you should not override this method. Instead, you can modify the
         model's database schema by overriding method :meth:`~.init`, which is
         called right after this one.
@@ -2639,10 +2577,8 @@ class BaseModel(object):
     @api.model_cr
     def _add_sql_constraints(self):
         """
-
         Modify this model's database table constraints so they match the one in
         _sql_constraints.
-
         """
         cr = self._cr
 
@@ -2901,13 +2837,10 @@ class BaseModel(object):
     @api.model
     def fields_get(self, allfields=None, attributes=None):
         """ fields_get([fields][, attributes])
-
         Return the definition of each field.
-
         The returned value is a dictionary (indiced by field name) of
         dictionaries. The _inherits'd fields are included. The string, help,
         and selection (if present) attributes are translated.
-
         :param allfields: list of fields to document, all if empty or not provided
         :param attributes: list of description attributes to return for each field, all if empty or not provided
         """
@@ -2977,10 +2910,8 @@ class BaseModel(object):
     @api.multi
     def read(self, fields=None, load='_classic_read'):
         """ read([fields])
-
         Reads the requested fields for the records in ``self``, low-level/RPC
         method. In Python code, prefer :meth:`~.browse`.
-
         :param fields: list of field names to return (default is all fields)
         :return: a list of dictionaries mapping field names to their values,
                  with one dictionary per record
@@ -3085,7 +3016,6 @@ class BaseModel(object):
     def _read_from_database(self, field_names, inherited_field_names=[]):
         """ Read the given fields of the records in ``self`` from the database,
             and store them in cache. Access errors are also stored in cache.
-
             :param field_names: list of column names of model ``self``; all those
                 fields are guaranteed to be read
             :param inherited_field_names: list of column names from parent
@@ -3193,10 +3123,8 @@ class BaseModel(object):
     def get_metadata(self):
         """
         Returns some metadata about the given records.
-
         :return: list of ownership dictionaries for each requested record
         :rtype: list of dictionaries with the following keys:
-
                     * id: object id
                     * create_uid: user who created the record
                     * create_date: date when the record was created
@@ -3292,7 +3220,6 @@ class BaseModel(object):
     def check_access_rule(self, operation):
         """ Verifies that the operation given by ``operation`` is allowed for
             the current user according to ir.rules.
-
            :param operation: one of ``write``, ``unlink``
            :raise UserError: * if current ir.rules do not permit this operation.
            :return: None if the operation is allowed
@@ -3369,13 +3296,10 @@ class BaseModel(object):
     @api.multi
     def unlink(self):
         """ unlink()
-
         Deletes the records of the current set
-
         :raise AccessError: * if user has no unlink rights on the requested object
                             * if user tries to bypass access rules for unlink on the requested object
         :raise UserError: if the record is default property for other records
-
         """
         if not self:
             return True
@@ -3456,21 +3380,15 @@ class BaseModel(object):
     @api.multi
     def write(self, vals):
         """ write(vals)
-
         Updates all records in the current set with the provided values.
-
         :param dict vals: fields to update and the value to set on them e.g::
-
                 {'foo': 1, 'bar': "Qux"}
-
             will set the field ``foo`` to ``1`` and the field ``bar`` to
             ``"Qux"`` if those are valid (otherwise it will trigger an error).
-
         :raise AccessError: * if user has no write rights on the requested object
                             * if user tries to bypass access rules for write on the requested object
         :raise ValidateError: if user tries to enter invalid value for a field that is not in selection
         :raise UserError: if a loop would be created in a hierarchy of objects a result of the operation (such as setting an object as its own parent)
-
         * For numeric fields (:class:`~odoo.fields.Integer`,
           :class:`~odoo.fields.Float`) the value should be of the
           corresponding type
@@ -3482,9 +3400,7 @@ class BaseModel(object):
         * For :class:`~odoo.fields.Many2one`, the value should be the
           database identifier of the record to set
         * Other non-relational fields use a string for value
-
           .. danger::
-
               for historical and compatibility reasons,
               :class:`~odoo.fields.Date` and
               :class:`~odoo.fields.Datetime` fields use strings as values
@@ -3494,15 +3410,12 @@ class BaseModel(object):
               :const:`odoo.tools.misc.DEFAULT_SERVER_DATE_FORMAT` and
               :const:`odoo.tools.misc.DEFAULT_SERVER_DATETIME_FORMAT`
         * .. _openerp/models/relationals/format:
-
           :class:`~odoo.fields.One2many` and
           :class:`~odoo.fields.Many2many` use a special "commands" format to
           manipulate the set of records stored in/associated with the field.
-
           This format is a list of triplets executed sequentially, where each
           triplet is a command to execute on the set of records. Not all
           commands apply in all situations. Possible commands are:
-
           ``(0, _, values)``
               adds a new record created from the provided ``value`` dict.
           ``(1, id, values)``
@@ -3528,7 +3441,6 @@ class BaseModel(object):
               replaces all existing records in the set by the ``ids`` list,
               equivalent to using the command ``5`` followed by a command
               ``4`` for each ``id`` in ``ids``.
-
           .. note:: Values marked as ``_`` in the list above are ignored and
                     can be anything, generally ``0`` or ``False``.
         """
@@ -3786,17 +3698,12 @@ class BaseModel(object):
     @api.returns('self', lambda value: value.id)
     def create(self, vals):
         """ create(vals) -> record
-
         Creates a new record for the model.
-
         The new record is initialized using the values from ``vals`` and
         if necessary those from :meth:`~.default_get`.
-
         :param dict vals:
             values for the model's fields, as a dictionary::
-
                 {'field_name': field_value, ...}
-
             see :meth:`~.write` for details
         :return: new record created
         :raise AccessError: * if user has no create rights on the requested object
@@ -4038,7 +3945,6 @@ class BaseModel(object):
     def _apply_ir_rules(self, query, mode='read'):
         """Add what's missing in ``query`` to implement all appropriate ir.rules
           (using the ``model_name``'s rules or the current model's rules if ``model_name`` is None)
-
            :param query: the current query object
         """
         if self._uid == SUPERUSER_ID:
@@ -4085,7 +3991,6 @@ class BaseModel(object):
         """
         Add possibly missing JOIN with translations table to ``query`` and
         generate the expression for the translated field.
-
         :return: the qualified field name (or expression) to use for ``field``
         """
         if self.env.lang:
@@ -4116,7 +4021,6 @@ class BaseModel(object):
         Add possibly missing JOIN to ``query`` and generate the ORDER BY clause for m2o fields,
         either native m2o fields or function/related fields that are stored, including
         intermediate JOINs for inheritance if required.
-
         :return: the qualified field name to use in an ORDER BY clause to sort by ``order_field``
         """
         field = self._fields[order_field]
@@ -4191,7 +4095,6 @@ class BaseModel(object):
         """
         Attempt to construct an appropriate ORDER BY clause based on order_spec, which must be
         a comma-separated list of valid field names, optionally followed by an ASC or DESC direction.
-
         :raise ValueError in case order_spec is malformed
         """
         order_by_clause = ''
@@ -4210,7 +4113,6 @@ class BaseModel(object):
         This is useful for example when filling in the selection list for a drop-down and avoiding access rights errors,
         by specifying ``access_rights_uid=1`` to bypass access rights check, but not ir.rules!
         This is ok at the security level because this method is private and not callable through XML-RPC.
-
         :param access_rights_uid: optional user ID to use when checking access rights
                                   (not for ir.rules, this is only for ir.model.access)
         :return: a list of record ids or an integer (if count is True)
@@ -4256,7 +4158,6 @@ class BaseModel(object):
     def copy_data(self, default=None):
         """
         Copy given record's data with all its fields values
-
         :param default: field values to override in the original values of the copied record
         :return: list with a dictionary containing all the field values
         """
@@ -4380,13 +4281,10 @@ class BaseModel(object):
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         """ copy(default=None)
-
         Duplicate record ``self`` updating it with default values
-
         :param dict default: dictionary of field values to override in the
                original values of the copied record, e.g: ``{'field_name': overridden_value, ...}``
         :returns: new record
-
         """
         self.ensure_one()
         vals = self.copy_data(default)[0]
@@ -4399,13 +4297,10 @@ class BaseModel(object):
     @api.returns('self')
     def exists(self):
         """  exists() -> records
-
         Returns the subset of records in ``self`` that exist, and marks deleted
         records as such in cache. It can be used as a test on records::
-
             if record.exists():
                 ...
-
         By convention, new records are returned as existing.
         """
         ids, new_ids = [], []
@@ -4429,7 +4324,6 @@ class BaseModel(object):
         Verifies that there is no loop in a hierarchical structure of records,
         by following the parent relationship using the **parent** field until a
         loop is detected or until a top-level record is found.
-
         :param parent: optional parent field name (default: ``self._parent_name``)
         :return: **True** if no loop was found, **False** otherwise.
         """
@@ -4454,7 +4348,6 @@ class BaseModel(object):
         """
         Verifies that there is no loop in a directed graph of records, by
         following a many2many relationship with the given field name.
-
         :param field_name: field to check
         :return: **True** if no loop was found, **False** otherwise.
         """
@@ -4491,13 +4384,10 @@ class BaseModel(object):
     @api.multi
     def _get_external_ids(self):
         """Retrieve the External ID(s) of any database record.
-
         **Synopsis**: ``_get_xml_ids() -> { 'id': ['module.xml_id'] }``
-
         :return: map of ids to the list of their fully qualified External IDs
                  in the form ``module.key``, or an empty list when there's no External
                  ID for a record, e.g.::
-
                      { 'id': ['module.ext_id', 'module.ext_id_bis'],
                        'id2': [] }
         """
@@ -4513,15 +4403,12 @@ class BaseModel(object):
         is one. This method works as a possible implementation
         for a function field, to be able to add it to any
         model object easily, referencing it as ``Model.get_external_id``.
-
         When multiple External IDs exist for a record, only one
         of them is returned (randomly).
-
         :return: map of ids to their fully qualified XML ID,
                  defaulting to an empty string when there's none
                  (to be usable as a function field),
                  e.g.::
-
                      { 'id': 'module.ext_id',
                        'id2': '' }
         """
@@ -4548,9 +4435,7 @@ class BaseModel(object):
     @classmethod
     def is_transient(cls):
         """ Return whether the model is transient.
-
         See :class:`TransientModel`.
-
         """
         return cls._transient
 
@@ -4578,7 +4463,6 @@ class BaseModel(object):
     @api.model
     def _transient_vacuum(self, force=False):
         """Clean the transient records.
-
         This unlinks old records from the transient model tables whenever the
         "_transient_max_count" or "_max_age" conditions (if any) are reached.
         Actual cleaning will happen only once every "_transient_check_time" calls.
@@ -4616,11 +4500,9 @@ class BaseModel(object):
         """ Serializes one2many and many2many commands into record dictionaries
             (as if all the records came from the database via a read()).  This
             method is aimed at onchange methods on one2many and many2many fields.
-
             Because commands might be creation commands, not all record dicts
             will contain an ``id`` field.  Commands matching an existing record
             will have an ``id``.
-
             :param field_name: name of the one2many or many2many field matching the commands
             :type field_name: str
             :param commands: one2many or many2many commands to execute on ``field_name``
@@ -4668,7 +4550,6 @@ class BaseModel(object):
     def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
         """
         Performs a ``search()`` followed by a ``read()``.
-
         :param domain: Search domain, see ``args`` parameter in ``search()``. Defaults to an empty domain that will match all records.
         :param fields: List of fields to read, see ``fields`` parameter in ``read()``. Defaults to all fields.
         :param offset: Number of records to skip, see ``offset`` parameter in ``search()``. Defaults to 0.
@@ -4676,7 +4557,6 @@ class BaseModel(object):
         :param order: Columns to sort result, see ``order`` parameter in ``search()``. Defaults to no sort.
         :return: List of dictionaries containing the asked fields.
         :rtype: List of dictionaries.
-
         """
         records = self.search(domain or [], offset=offset, limit=limit, order=order)
         if not records:
@@ -4720,21 +4600,16 @@ class BaseModel(object):
             the method called ``name`` by ``method`` in the given class.
             The original method is then accessible via ``method.origin``, and it
             can be restored with :meth:`~._revert_method`.
-
             Example::
-
                 @api.multi
                 def do_write(self, values):
                     # do stuff, and call the original method
                     return do_write.origin(self, values)
-
                 # patch method write of model
                 model._patch_method('write', do_write)
-
                 # this will call do_write
                 records = model.search([...])
                 records.write(...)
-
                 # restore the original method
                 model._revert_method('write')
         """
@@ -4770,7 +4645,6 @@ class BaseModel(object):
     @classmethod
     def _browse(cls, ids, env, prefetch=None):
         """ Create a recordset instance.
-
         :param ids: a tuple of record ids
         :param env: an environment
         :param prefetch: an optional prefetch object
@@ -4786,10 +4660,8 @@ class BaseModel(object):
 
     def browse(self, arg=None, prefetch=None):
         """ browse([ids]) -> records
-
         Returns a recordset for the ids provided as parameter in the current
         environment.
-
         Can take no ids, a single id or a sequence of ids.
         """
         ids = _normalize_ids(arg)
@@ -4827,66 +4699,51 @@ class BaseModel(object):
     def with_env(self, env):
         """ Returns a new version of this recordset attached to the provided
         environment
-
         .. warning::
             The new environment will not benefit from the current
             environment's data cache, so later data access may incur extra
             delays while re-fetching from the database.
             The returned recordset has the same prefetch object as ``self``.
-
         :type env: :class:`~odoo.api.Environment`
         """
         return self._browse(self._ids, env, self._prefetch)
 
     def sudo(self, user=SUPERUSER_ID):
         """ sudo([user=SUPERUSER])
-
         Returns a new version of this recordset attached to the provided
         user.
-
         By default this returns a ``SUPERUSER`` recordset, where access
         control and record rules are bypassed.
-
         .. note::
-
             Using ``sudo`` could cause data access to cross the
             boundaries of record rules, possibly mixing records that
             are meant to be isolated (e.g. records from different
             companies in multi-company environments).
-
             It may lead to un-intuitive results in methods which select one
             record among many - for example getting the default company, or
             selecting a Bill of Materials.
-
         .. note::
-
             Because the record rules and access control will have to be
             re-evaluated, the new recordset will not benefit from the current
             environment's data cache, so later data access may incur extra
             delays while re-fetching from the database.
             The returned recordset has the same prefetch object as ``self``.
-
         """
         return self.with_env(self.env(user=user))
 
     def with_context(self, *args, **kwargs):
         """ with_context([context][, **overrides]) -> records
-
         Returns a new version of this recordset attached to an extended
         context.
-
         The extended context is either the provided ``context`` in which
         ``overrides`` are merged or the *current* context in which
         ``overrides`` are merged e.g.::
-
             # current context is {'key1': True}
             r2 = records.with_context({}, key2=True)
             # -> r2._context is {'key2': True}
             r2 = records.with_context(key2=True)
             # -> r2._context is {'key1': True, 'key2': True}
-
         .. note:
-
             The returned recordset has the same prefetch object as ``self``.
         """
         context = dict(args[0] if args else self._context, **kwargs)
@@ -4894,7 +4751,6 @@ class BaseModel(object):
 
     def with_prefetch(self, prefetch=None):
         """ with_prefetch([prefetch]) -> records
-
         Return a new version of this recordset that uses the given prefetch
         object, or a new prefetch object if not given.
         """
@@ -4902,7 +4758,6 @@ class BaseModel(object):
 
     def _convert_to_cache(self, values, update=False, validate=True):
         """ Convert the ``values`` dictionary into cached values.
-
             :param update: whether the conversion is made for updating ``self``;
                 this is necessary for interpreting the commands of *2many fields
             :param validate: whether values must be checked
@@ -4959,7 +4814,6 @@ class BaseModel(object):
         """ Apply ``func`` on all records in ``self``, and return the result as a
             list or a recordset (if ``func`` return recordsets). In the latter
             case, the order of the returned recordset is arbitrary.
-
             :param func: a function or a dot-separated sequence of field names
                 (string); any falsy value simply returns the recordset ``self``
         """
@@ -4987,7 +4841,6 @@ class BaseModel(object):
     def filtered(self, func):
         """ Select the records in ``self`` such that ``func(rec)`` is true, and
             return them as a recordset.
-
             :param func: a function or a dot-separated sequence of field names
         """
         if isinstance(func, basestring):
@@ -4997,11 +4850,9 @@ class BaseModel(object):
 
     def sorted(self, key=None, reverse=False):
         """ Return the recordset ``self`` ordered by ``key``.
-
             :param key: either a function of one argument that returns a
                 comparison key for each record, or a field name, or ``None``, in
                 which case records are ordered according the default model's order
-
             :param reverse: if ``True``, return the result in reverse order
         """
         if key is None:
@@ -5026,7 +4877,6 @@ class BaseModel(object):
     @api.model
     def new(self, values={}):
         """ new([values]) -> record
-
         Return a new record instance attached to the current environment and
         initialized with the provided ``value``. The record is *not* created
         in database, it only exists in memory.
@@ -5086,7 +4936,6 @@ class BaseModel(object):
     def __contains__(self, item):
         """ Test whether ``item`` (record or field name) is an element of ``self``.
             In the first case, the test is fully equivalent to::
-
                 any(item == record for record in self)
         """
         if isinstance(item, BaseModel) and self._name == item._name:
@@ -5200,9 +5049,7 @@ class BaseModel(object):
         """ If ``key`` is an integer or a slice, return the corresponding record
             selection as an instance (attached to ``self.env``).
             Otherwise read the field ``key`` of the first record in ``self``.
-
             Examples::
-
                 inst = model.search(dom)    # inst is a recordset
                 r4 = inst[3]                # fourth record in inst
                 rs = inst[10:20]            # subset of inst
@@ -5242,7 +5089,6 @@ class BaseModel(object):
     @api.model
     def refresh(self):
         """ Clear the records cache.
-
             .. deprecated:: 8.0
                 The record cache is automatically invalidated.
         """
@@ -5252,7 +5098,6 @@ class BaseModel(object):
     def invalidate_cache(self, fnames=None, ids=None):
         """ Invalidate the record caches after some records have been modified.
             If both ``fnames`` and ``ids`` are ``None``, the whole cache is cleared.
-
             :param fnames: the list of modified fields, or ``None`` for all fields
             :param ids: the list of modified record ids, or ``None`` for all
         """
@@ -5273,7 +5118,6 @@ class BaseModel(object):
         """ Notify that fields have been modified on ``self``. This invalidates
             the cache, and prepares the recomputation of stored function fields
             (new-style fields only).
-
             :param fnames: iterable of field names that have been modified on
                 records ``self``
         """
@@ -5425,7 +5269,6 @@ class BaseModel(object):
     @api.multi
     def onchange(self, values, field_name, field_onchange):
         """ Perform an onchange on the given field.
-
             :param values: dictionary mapping field names to values, giving the
                 current state of modification
             :param field_name: name of the modified field, or list of field
@@ -5605,12 +5448,9 @@ AbstractModel = BaseModel
 
 class Model(AbstractModel):
     """ Main super-class for regular database-persisted Odoo models.
-
     Odoo models are created by inheriting from this class::
-
         class user(Model):
             ...
-
     The system will later instantiate the class once per database (on
     which the class' module is installed).
     """
@@ -5622,7 +5462,6 @@ class Model(AbstractModel):
 class TransientModel(Model):
     """ Model super-class for transient records, meant to be temporarily
     persisted, and regularly vacuum-cleaned.
-
     A TransientModel has a simplified access rights management, all users can
     create new records, and may only access the records they created. The super-
     user has unrestricted access to all TransientModel records.
@@ -5685,15 +5524,12 @@ PGERROR_TO_OE = defaultdict(
 
 def _normalize_ids(arg, atoms=set(IdType)):
     """ Normalizes the ids argument for ``browse`` (v7 and v8) to a tuple.
-
     Various implementations were tested on the corpus of all browse() calls
     performed during a full crawler run (after having installed all website_*
     modules) and this one was the most efficient overall.
-
     A possible bit of correctness was sacrificed by not doing any test on
     Iterable and just assuming that any non-atomic type was an iterable of
     some kind.
-
     :rtype: tuple
     """
     # much of the corpus is falsy objects (empty list, tuple or set, None)
